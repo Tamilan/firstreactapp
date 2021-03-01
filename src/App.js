@@ -1,19 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-//import logo from './logo.svg';
-//import './App.css';
-//import { Nav, Container, Row, Col } from 'react-bootstrap';
-// import {
-//   BrowserRouter as Router,
-//   Switch,
-//   Route,
-//   Link
-// } from "react-router-dom";
+
 import Menu from './components/Menu.js';
+
+require('dotenv').config();
 
 function App() {
   return (
     <div className="App">
-      <div class="container-fluid">
+      <div className="container-fluid">
         {/* <Row>
           <Col>1 of 1</Col>
         </Row> */}
