@@ -8,6 +8,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 import { withAlert } from 'react-alert';
 
+
 class Bucket extends React.Component {
 	constructor(props) {
 		super(props);
@@ -18,6 +19,18 @@ class Bucket extends React.Component {
 	}
 
 	componentDidMount() {
+		// API.get(`/s3/buckets`)
+		// .then(res => {
+		// const buckets = res.data.data.Buckets;
+		// console.log(buckets);
+		// this.setState({ buckets: buckets });
+		// console.log(this.state);
+		// });
+		this.get_buckets();
+		
+	}
+
+	get_buckets() {
 		API.get(`/s3/buckets`)
 		.then(res => {
 		const buckets = res.data.data.Buckets;
@@ -25,14 +38,11 @@ class Bucket extends React.Component {
 		this.setState({ buckets: buckets });
 		console.log(this.state);
 		});
-		
 	}
 
 	delete_row(bucket) {
-		//let alert = useAlert();
-		const alert = this.props.alert;
-		alert.show('Oh look, an alert!');
-		return;
+		
+		
 		confirmAlert({
 			title: 'Confirm to delete',
 			message: 'Are you sure to do this.',
@@ -53,14 +63,26 @@ class Bucket extends React.Component {
 	}
 	
 	delete(bucket) {
-		//console.log(bucket);
-		// API.get(`/s3/buckets`)
-		// .then(res => {
-		// const buckets = res.data.data.Buckets;
-		// console.log(buckets);
-		// this.setState({ buckets: buckets });
-		// console.log(this.state);
-		// });
+		API.delete(`/s3/bucket`,{
+			params: {name: bucket}
+		})
+		.then(res => {
+			const data = res.data;
+			const alert = this.props.alert;
+			if(data.status!=undefined) {
+				switch (data.status) {
+					case 'success':
+						alert.show(data.message);
+						this.get_buckets();
+						break;
+				
+					default:
+						alert.error(data.message);
+						break;
+				}
+			}
+		});
+
 	}
 
 
@@ -100,4 +122,5 @@ class Bucket extends React.Component {
 	}
 }
 
+//export default Bucket;
 export default withAlert()(Bucket);
