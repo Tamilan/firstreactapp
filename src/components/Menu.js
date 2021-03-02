@@ -10,6 +10,7 @@ import Users from './Users';
 import Login from './Login';
 import Signup from './Signup';
 import AdminPage from './AdminPage';
+import Bucket from './Bucket';
 
 
 import { history } from '../helpers/history';
@@ -59,7 +60,7 @@ class Menu extends React.Component {
 							<Link className="nav-link" to="/">Home</Link>
 						</li>
 						<li className="nav-item">
-							<Link className="nav-link" to="/users">Users</Link>
+							<Link className="nav-link" to="/buckets">Buckets</Link>
 						</li>
 						{is_admin &&
 						<li className="nav-item">
@@ -114,6 +115,8 @@ class Menu extends React.Component {
 					<Route path="/signup" component={Signup} />
 					<Route path="/login" component={Login} />
 					<PrivateRoute path="/users" roles={[Role.User, Role.Admin]} component={Users} />
+
+					<PrivateRoute path="/buckets" component={Bucket} />
 
 					<PrivateRoute exact path="/" component={Home} />
 					<PrivateRoute path="/admin" roles={[Role.Admin]} component={AdminPage} />

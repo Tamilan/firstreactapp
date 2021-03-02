@@ -20,7 +20,7 @@ class Signup extends React.Component {
 		this.validator = new SimpleReactValidator({className : "text-danger"});
 		console.log(this.validator);
 
-		this.request = new Request();
+		//this.request = new Request();
 		//const renderCount = 0;
 	}
 
