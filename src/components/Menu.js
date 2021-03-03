@@ -10,7 +10,9 @@ import Users from './Users';
 import Login from './Login';
 import Signup from './Signup';
 import AdminPage from './AdminPage';
-import Bucket from './Bucket';
+import Buckets from './Buckets';
+import AddBucket from './AddBucket';
+import Objects from './Objects';
 
 
 import { history } from '../helpers/history';
@@ -116,7 +118,12 @@ class Menu extends React.Component {
 					<Route path="/login" component={Login} />
 					<PrivateRoute path="/users" roles={[Role.User, Role.Admin]} component={Users} />
 
-					<PrivateRoute path="/buckets" component={Bucket} />
+					<PrivateRoute path="/buckets" component={Buckets} />
+
+					<PrivateRoute path="/bucket/add" component={AddBucket} />
+
+					<PrivateRoute exact path="/:bucket/objects" component={Objects} />
+
 
 					<PrivateRoute exact path="/" component={Home} />
 					<PrivateRoute path="/admin" roles={[Role.Admin]} component={AdminPage} />
