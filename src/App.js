@@ -16,8 +16,6 @@ const options = {
 
 require('dotenv').config();
 
-
-
 function App() {
   return (
     <AlertProvider template={AlertTemplate} {...options}>
