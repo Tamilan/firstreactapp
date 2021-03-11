@@ -20,6 +20,8 @@ import { Role } from '../helpers/role';
 import { authenticationService } from '../services/authenticationService';
 import { PrivateRoute } from './PrivateRoute';
 
+//import Breadcrumb from './Breadcrumb';
+
 class Menu extends React.Component {
 	constructor(props) {
 		super(props);
@@ -33,7 +35,7 @@ class Menu extends React.Component {
 	componentDidMount() {
         authenticationService.currentUser.subscribe(x => this.setState({
             currentUser: x,
-            is_admin: x && x.role === Role.Admin
+            //is_admin: x && x.role === Role.Admin
         }));
     }
 
@@ -44,6 +46,13 @@ class Menu extends React.Component {
 
 	render() {
 		const { currentUser, is_admin } = this.state;
+
+		//const [crumbs, setCrumbs] = useState(['Home', 'Category', 'Sub Category']);
+
+		// const selected = crumb => {
+		// 	console.log(crumb);
+		// }
+
 		return (
 		<Router history={history}>
 			<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -97,7 +106,7 @@ class Menu extends React.Component {
 					}
 				</div>
 			</nav>
-			
+			{/* <Breadcrumb crumbs={ crumbs } selected={ selected }  /> */}
 			<div className="container" style={{"marginTop" : "50px"}}>
 				<Switch>
 

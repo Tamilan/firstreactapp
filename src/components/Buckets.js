@@ -32,12 +32,24 @@ class Buckets extends React.Component {
 	}
 
 	get_buckets() {
+		console.log(API);
 		API.get(`/s3/buckets`)
 		.then(res => {
-		const buckets = res.data.data.Buckets;
-		console.log(buckets);
-		this.setState({ buckets: buckets });
+			const alert = this.props.alert;
+			let response = res.data;
+			if(response['status']!=undefined) {
+				if(response['status']=='error') {
+					alert.error(response.message);
+				} else {
+					const buckets = response.data.Buckets;
+					console.log(buckets);
+					this.setState({ buckets: buckets });
+				}
+			}
+		
 		console.log(this.state);
+		}).catch( err => {
+			console.log(err);
 		});
 	}
 

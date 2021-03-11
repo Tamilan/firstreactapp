@@ -1,5 +1,7 @@
 import React from 'react';
 import {FaTrash} from 'react-icons/fa';
+import { BiLoaderAlt } from "react-icons/bi";
+
 
 import API from '../services/Request';
 
@@ -9,6 +11,9 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { withAlert } from 'react-alert';
 
 import { Link } from "react-router-dom";
+import { Modal, Button } from 'react-bootstrap';
+
+
 
 
 class Objects extends React.Component {
@@ -16,7 +21,11 @@ class Objects extends React.Component {
 		super(props);
 		this.state = {
 			objects: [],
-			bucket: this.props.match.params.bucket
+			bucket: this.props.match.params.bucket,
+			showHide : false,
+			selectedFile: null,
+			//path: "",
+			fileupload_in_progress : false
 		};
 	}
 
@@ -105,6 +114,75 @@ class Objects extends React.Component {
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
 
+	handleModalShowHide() {
+        this.setState({ showHide: !this.state.showHide })
+    }
+
+	// handleChange = event => {
+	// 	//console.log(event.target.value);
+	// 	this.setState({ path: event.target.value });
+	// }
+
+	handleModelClose = event => {
+		console.log('model closed');
+	}
+
+	file_select = event => {
+		this.setState({ selectedFile: event.target.files[0] });
+	}
+
+	//create_object = () => {
+	create_object() {
+		
+		if(!this.state.selectedFile) {
+			alert("Please select file.");
+			return false;
+		}
+		// Create an object of formData
+		const formData = new FormData();
+		
+		console.log(this.state);
+		// Update the formData object
+		//formData.append("path", this.state.path);
+		formData.append("bucket", this.state.bucket);
+		formData.append("object", this.state.selectedFile);
+	  
+		this.setState({"fileupload_in_progress": true});
+		// Send formData object
+		API.post("/s3/createobject", formData)
+		.then(res => {
+
+			const data = res.data;
+			const _alert = this.props.alert;
+			//alert(data.message);
+			if(data.status!=undefined) {
+				switch (data.status) {
+					case 'success':
+						this.get_objects();
+						this.handleModalShowHide();
+						
+						_alert.success(data.message);
+						this.get_objects();
+						break;
+					// case 'error':
+					// 	alert(data.message);
+					// 	break;
+				
+					default:
+						alert(data.message);
+						break;
+				}
+			}
+			this.setState({"fileupload_in_progress": false});
+			
+			
+		}).catch(error => {
+			console.log(error)
+		}).then(function () {
+			//this.setState({"fileupload_in_progress": false});
+		});
+	}
+
 
 	render () {
 		let objectLength = 0;
@@ -114,16 +192,47 @@ class Objects extends React.Component {
 
 		return (
 			<>
+			<Modal show={this.state.showHide} onHide={this.handleModelClose} backdrop="static">
+				<Modal.Header closeButton onClick={() => this.handleModalShowHide()}>
+					<Modal.Title>Add Object to {this.state.bucket} bucket</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<form style={{marginTop:"20px"}}>
+						{/* <div className="form-group">
+							<label htmlFor="name">Path</label>
+							<input type="text" className="form-control" name="path" onChange={this.handleChange} />
+							
+						</div> */}
+						<div className="form-group">
+							<label>File</label>
+    						<input type="file" class="form-control-file" name="object" onChange={this.file_select} />
+							{/* {this.validator.message('object', this.state.selectedFile, 'required', {
+								messages: {
+									required : "Please select the file.",
+								}
+							})} */}
+						</div>
+						
+					</form>
+				</Modal.Body>
+				<Modal.Footer>
+				<Button variant="secondary" onClick={() => this.handleModalShowHide()}>
+					Cancel
+				</Button>
+				<Button variant="primary" disabled={this.state.fileupload_in_progress} onClick={() => this.create_object()}>
+					Create
+				</Button>
+				</Modal.Footer>
+			</Modal>
 			<div className="row">
 				<div className="col-md-6">
 					<h2>Objects</h2>
 				</div>
 				<div className="col-md-6 text-right">
-					<Link to="/object/add">
-					<button className="btn btn-primary">
+					
+					<button className="btn btn-primary" onClick={() => this.handleModalShowHide()}>
 						Add Object
 					</button>
-					</Link>
 				</div>
 			</div>
 			

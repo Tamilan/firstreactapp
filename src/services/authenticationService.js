@@ -3,14 +3,19 @@ import { BehaviorSubject } from 'rxjs';
 //import config from 'config';
 import { handleResponse } from '../helpers/handleResponse';
 import axios from "axios";
+import http from './Request';
+import LocalStorageService from './LocalStorageService';
 
 const currentUserSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('currentUser')));
+
+const localStorageService = LocalStorageService.getService();
 
 export const authenticationService = {
     login,
     logout,
 	is_valid,
     get_role,
+    get_token,
     currentUser: currentUserSubject.asObservable(),
     get currentUserValue () { return currentUserSubject.value },
 };
@@ -21,10 +26,22 @@ function is_valid() {
     if(!user) {
         return false;
     }
-    if(user.id!==undefined && user.id!=='') {
+    if(user.authenticated!==undefined && user.authenticated===true) {
         return true;
     }
     return false;
+}
+
+function get_token() {
+    let user = currentUserSubject.value;
+    //console.log(user);
+    if(!user) {
+        return null;
+    }
+    if(user.access_token!==undefined && user.access_token!=='') {
+        return user.access_token;
+    }
+    return null;
 }
 
 function get_role() {
@@ -41,34 +58,46 @@ function get_role() {
 
 function login(user) {
 
-    const instance = axios.create({
-        baseURL: 'http://localhost:3001',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json',
-        },
-    });
+    // const instance = axios.create({
+    //     baseURL: 'http://localhost:3001',
+    //     headers: {
+    //         'X-Requested-With': 'XMLHttpRequest',
+    //         'Content-Type': 'application/json',
+    //     },
+    // });
 
+    return http.post('/auth', user
+    //return instance.post('/auth', user
+        // {
+        //     params: {
+        //     user
+        //     }
+        // }
+        )
+        .then(function (response) {
+            console.log(response);
+            if(response.data['status']!=undefined) {
+                if(response.data['status']=='success') {
+                    let user_data = response.data.data;
+                    console.log(user_data);
+                    localStorage.setItem('currentUser', JSON.stringify(user_data));
+                    currentUserSubject.next(user_data);
+                    localStorageService.setToken(user_data)
+                } else {
+                    alert(response.data['message']);
+                }
+            }
+            
+            
+        })
+        .catch(function (error) {
+            alert(123);
+            console.log(error);
+        })
+        .then(function () {
+            // always executed
+        });
 
-    return instance.post('/auth', {
-        params: {
-          user
-        }
-      })
-      .then(function (response) {
-        console.log(response);
-        let user_data = response.data;
-        localStorage.setItem('currentUser', JSON.stringify(user_data));
-        currentUserSubject.next(user_data);
-      })
-      .catch(function (error) {
-        alert(123);
-        console.log(error);
-      })
-      .then(function () {
-        // always executed
-      });
-	
 	
 }
 
@@ -95,4 +124,5 @@ function logout() {
     // remove user from local storage to log user out
     localStorage.removeItem('currentUser');
     currentUserSubject.next(null);
+    localStorageService.clearToken();
 }
