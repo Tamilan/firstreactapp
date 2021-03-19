@@ -1,8 +1,7 @@
 import React from 'react';
 import SimpleReactValidator from 'simple-react-validator';
-import axios from 'axios';
-//import config from "./config/config.json";
-import Request from "../services/Request";
+import http from '../services/Request';
+import { withAlert } from 'react-alert';
 
 let renderCount = 0;
 
@@ -28,76 +27,69 @@ class Signup extends React.Component {
 		this.setState({[event.target.id] : event.target.value});
 	}
 
+	reset_form() {
+		this.setState({
+			name:'',
+			email:'',
+			password:'',
+			gender:''
+		})
+		console.log('reset')
+	}
+
 	handleSubmit(event) {
-
-		// console.log(process.env.REACT_APP_API_BASE_URI);
-		// console.log(process.env.API_BASE_URI);
-
-		if (this.validator.allValid()) {
-			let data = this.state;
-			//alert('You submitted the form and stuff!');
-
-			//this.request.instance
-
-			axios.post("http://localhost:3001/signup",
-			{
-				params: data
-			}, {
-				headers: { 'header' : 'headerrr'}
-			
-			}).then(function (response) {
-				console.log(response);
-			}).catch(function (error) {
-				if (error.response) {
-					alert('There is an error on ajax call.');
-				  // The request was made and the server responded with a status code
-				  // that falls out of the range of 2xx
-				  console.log(error.response.data);
-				  console.log(error.response.status);
-				  console.log(error.response.headers);
-				} else if (error.request) {
-				  // The request was made but no response was received
-				  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-				  // http.ClientRequest in node.js
-				  console.log(error.request);
-				} else {
-				  // Something happened in setting up the request that triggered an Error
-				  console.log('Error', error.message);
-				}
-				console.log(error.config);
-			});
-
-
-			// axios.post({
-			// 	url: '/signup',
-			// 	data: data,
-
-			// }).then(function (response) {
-			// 	console.log(response);
-			// }).catch(function (error) {
-			// 	if (error.response) {
-			// 		alert('There is an error on ajax call.');
-			// 	  // The request was made and the server responded with a status code
-			// 	  // that falls out of the range of 2xx
-			// 	  console.log(error.response.data);
-			// 	  console.log(error.response.status);
-			// 	  console.log(error.response.headers);
-			// 	} else if (error.request) {
-			// 	  // The request was made but no response was received
-			// 	  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-			// 	  // http.ClientRequest in node.js
-			// 	  console.log(error.request);
-			// 	} else {
-			// 	  // Something happened in setting up the request that triggered an Error
-			// 	  console.log('Error', error.message);
-			// 	}
-			// 	console.log(error.config);
-			// });
-		} else {
+		const _alert = this.props.alert;
+		if (!this.validator.allValid()) {
 			this.validator.showMessages();
 			// rerender to show messages for the first time
 			// you can use the autoForceUpdate option to do this automatically`
 			this.forceUpdate();
+		} else {
+			let data = this.state;
+			http.post("/signup",
+			{
+				params: data
+			}).then(response => {
+				let data = response.data;
+				_alert.success(data.message);
+				this.reset_form();
+				this.validator.hideMessages();
+				console.log(data);
+				// if(data.status!=undefined) {
+				// 	switch (data.status) {
+				// 		case 'success':
+				// 			_alert.success(data.message);
+				// 			this.reset_form();
+				// 			break;
+					
+				// 		default:
+				// 			_alert.error(data.message);
+				// 			break;
+				// 	}
+				// }
+			}).catch(function (error) {
+				if (error.response) {
+
+					let data = error.response.data
+
+					if(data.message!=undefined) {
+						_alert.error(data.message);
+					}
+					//alert('There is an error on ajax call.');
+					// The request was made and the server responded with a status code
+					// that falls out of the range of 2xx
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
+				} else if (error.request) {
+					console.log(error.request);
+				} else {
+					// Something happened in setting up the request that triggered an Error
+					console.log('Error', error.message);
+				}
+				console.log(error.config);
+			});
+			
 		}
 		// console.log(this.state);
 		// alert('A name was submitted: ' + this.state.name);
@@ -106,7 +98,7 @@ class Signup extends React.Component {
 
 
 	render() {
-		renderCount++;
+		//renderCount++;
 		return ( 
 		<div className="row">
 			<div className="col-md-6 offset-md-3">
@@ -134,14 +126,14 @@ class Signup extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="gender">Gender</label>
-						<select className="form-control" id="gender" onChange={this.handleChange}>
+						<select className="form-control" id="gender" value={this.state.gender} onChange={this.handleChange}>
 							<option value="">Select</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
 						</select>
 						{this.validator.message('gender', this.state.gender, 'required')}
 					</div>
-					<button type="submit" className="btn btn-primary">Save {renderCount}</button>
+					<button type="submit" className="btn btn-primary">Submit</button>
 				</form>
 			</div>
 		</div>
@@ -149,4 +141,5 @@ class Signup extends React.Component {
 	}
 }
 
-export default Signup;
+//export default Signup;
+export default withAlert()(Signup);

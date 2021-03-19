@@ -16,6 +16,7 @@ export const authenticationService = {
 	is_valid,
     get_role,
     get_token,
+    get_name,
     currentUser: currentUserSubject.asObservable(),
     get currentUserValue () { return currentUserSubject.value },
 };
@@ -56,7 +57,18 @@ function get_role() {
     return null;
 }
 
-function login(user) {
+function get_name() {
+    let user = currentUserSubject.value;
+    if(!user) {
+        return null;
+    }
+    if(user.data!==undefined && user.data!=='') {
+        return user.data.name;
+    }
+    return null;
+}
+
+function login_s3(user) {
 
     // const instance = axios.create({
     //     baseURL: 'http://localhost:3001',
@@ -97,6 +109,44 @@ function login(user) {
         .then(function () {
             // always executed
         });
+
+	
+}
+
+function login(user) {
+
+
+    let user_data = user;
+    console.log(user_data);
+    localStorage.setItem('currentUser', JSON.stringify(user_data));
+    currentUserSubject.next(user_data);
+    localStorageService.setToken(user_data)
+
+    // return http.post('/auth', user)
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if(response.data['status']!=undefined) {
+    //             if(response.data['status']=='success') {
+    //                 let user_data = response.data.data;
+    //                 console.log(user_data);
+    //                 localStorage.setItem('currentUser', JSON.stringify(user_data));
+    //                 currentUserSubject.next(user_data);
+    //                 localStorageService.setToken(user_data)
+    //             } else {
+    //                 alert(response.data['message']);
+    //             }
+    //         }
+            
+    //     })
+    //     .catch(function (error) {
+    //         //alert(error);
+    //         console.log(error);
+    //         let data = error.response.data;
+    //         alert(data.message);
+    //     })
+    //     .then(function () {
+    //         // always executed
+    //     });
 
 	
 }

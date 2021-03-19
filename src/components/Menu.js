@@ -13,6 +13,9 @@ import AdminPage from './AdminPage';
 import Buckets from './Buckets';
 import AddBucket from './AddBucket';
 import Objects from './Objects';
+import Profile from './Profile';
+import User from './User';
+import Policy from './Policy';
 
 
 import { history } from '../helpers/history';
@@ -73,6 +76,9 @@ class Menu extends React.Component {
 						<li className="nav-item">
 							<Link className="nav-link" to="/buckets">Buckets</Link>
 						</li>
+						<li className="nav-item">
+							<Link className="nav-link" to="/users">Users</Link>
+						</li>
 						{is_admin &&
 						<li className="nav-item">
 							<Link className="nav-link" to="/admin">Admin</Link>
@@ -100,9 +106,15 @@ class Menu extends React.Component {
 					</li> */}
 					</ul>
 					{currentUser &&
-					<span class="navbar-text">
-						<a href="#" className="nav-link" onClick={this.logout} >Logout</a>
-					</span>
+						<>
+						<span class="navbar-text">
+							<Link className="nav-link" to="/profile">{ authenticationService.get_name() }</Link>
+							{/* { authenticationService.get_name() } */}
+						</span>
+						<span class="navbar-text">
+							<a href="#" className="nav-link" onClick={this.logout} >Logout</a>
+						</span>
+						</>
 					}
 				</div>
 			</nav>
@@ -136,7 +148,9 @@ class Menu extends React.Component {
 
 					<PrivateRoute exact path="/" component={Home} />
 					<PrivateRoute path="/admin" roles={[Role.Admin]} component={AdminPage} />
-					{/* <Route path="/login" component={LoginPage} /> */}
+					<PrivateRoute exact path="/profile" component={Profile} />
+					<PrivateRoute path="/user/:id" component={User} />
+					<PrivateRoute path="/policy" component={Policy} />
 
 				</Switch>
 			</div>

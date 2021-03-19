@@ -8,7 +8,7 @@ import LocalStorageService from "./LocalStorageService";
 import { history } from '../helpers/history';
 
 const config = {
-	baseURL: 'http://localhost:3001'
+	baseURL: 'http://192.168.10.17:3001'
 }
 
 //export default axios.create({
