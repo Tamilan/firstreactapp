@@ -16,6 +16,7 @@ import Objects from './Objects';
 import Profile from './Profile';
 import User from './User';
 import Policy from './Policy';
+import Policies from './Policies';
 
 
 import { history } from '../helpers/history';
@@ -78,6 +79,9 @@ class Menu extends React.Component {
 						</li>
 						<li className="nav-item">
 							<Link className="nav-link" to="/users">Users</Link>
+						</li>
+						<li className="nav-item">
+							<Link className="nav-link" to="/policies">Policies</Link>
 						</li>
 						{is_admin &&
 						<li className="nav-item">
@@ -150,7 +154,10 @@ class Menu extends React.Component {
 					<PrivateRoute path="/admin" roles={[Role.Admin]} component={AdminPage} />
 					<PrivateRoute exact path="/profile" component={Profile} />
 					<PrivateRoute path="/user/:id" component={User} />
-					<PrivateRoute path="/policy" component={Policy} />
+					<PrivateRoute exact path="/policy" component={Policy} />
+					<PrivateRoute exact path="/policies" component={Policies} />
+					<PrivateRoute path="/policy/:policy_name" component={Policy} />
+					
 
 				</Switch>
 			</div>
