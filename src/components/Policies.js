@@ -5,6 +5,9 @@ import {FaTrash, FaEdit} from 'react-icons/fa';
 import {
 	Link
   } from "react-router-dom";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import PageLoader from './PageLoader';
 
 class Policies extends React.Component {
 	constructor(props) {
@@ -12,13 +15,9 @@ class Policies extends React.Component {
 		this.state = {
 			policies: [],
 			policies_filter: [],
-			filter: ''
+			filter: '',
+			loader: false
 		};
-
-	
-		// this.validator = new SimpleReactValidator({className : "text-danger"});
-		// this.handleChange = this.handleChange.bind(this);
-		// this.onValueChange = this.onValueChange.bind(this);
 
 	}
 
@@ -27,6 +26,7 @@ class Policies extends React.Component {
 	}
 
 	get_policies() {
+		this.setState({loader: true});
 		http.get(`/s3/policies`)
 		.then(res => {
 			const policies = res.data.data;
@@ -35,11 +35,53 @@ class Policies extends React.Component {
 			console.log(this.state);
 		}).catch(error => {
 			console.log(error)
+		}).then(()=>{
+			this.setState({loader: false});
 		});
 	}
 
 
 	delete_row(policy) {
+		confirmAlert({
+			title: 'Attention!',
+			message: 'Are you sure want to delete.',
+			buttons: [
+			  {
+				label: 'Yes',
+				onClick: () => {
+					this.delete(policy);
+				}
+			  },
+			  {
+				label: 'No',
+				//onClick: () => alert('Click No')
+			  }
+			]
+		});	
+	}
+
+	delete(policy) {
+		http.delete(`/s3/policy`,{
+			params: {name: policy}
+		})
+		.then(res => {
+			const data = res.data;
+			const alert = this.props.alert;
+			if(data.status!=undefined) {
+				switch (data.status) {
+					case 'success':
+						alert.success(data.message);
+						this.get_policies();
+						break;
+				
+					default:
+						alert.error(data.message);
+						break;
+				}
+			}
+		}).catch((err) => {
+			console.log(err)
+		});
 
 	}
 
@@ -62,6 +104,7 @@ class Policies extends React.Component {
 
 		return (
 			<>
+			{this.state.loader && <PageLoader />}
 			<div className="row">
 				<div className="col-md-6">
 					<h2>Policies</h2>
@@ -90,8 +133,8 @@ class Policies extends React.Component {
 							<th scope="row">{i+1}</th>
 							<td>{policy}</td>
 							<td>
-								<Link to={`/policy/${policy}`}>
-									<FaEdit style={{"marginRight":"20px"}} />
+								<Link style={{}} to={`/policy/${policy}`}>
+									<FaEdit style={{"marginRight":"20px", "color":"#FFF"}} />
 								</Link>
 								&nbsp;
 								<FaTrash onClick={this.delete_row.bind(this, policy)} />

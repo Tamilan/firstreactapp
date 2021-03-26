@@ -10,12 +10,15 @@ import { withAlert } from 'react-alert';
 
 import { Link } from "react-router-dom";
 
+import PageLoader from './PageLoader';
+
 
 class Users extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			users: []
+			users: [],
+			loader: false
 		};
 	}
 
@@ -24,6 +27,7 @@ class Users extends React.Component {
 	}
 
 	get_users() {
+		this.setState({loader: true});
 		http.get(`/users`)
 		.then(res => {
 			let response = res.data;
@@ -33,6 +37,9 @@ class Users extends React.Component {
 			console.log(this.state);
 		}).catch( err => {
 			console.log(err);
+			
+		}).then(() => {
+			this.setState({loader: false});
 		});
 	}
 
@@ -85,6 +92,8 @@ class Users extends React.Component {
 	render () {
 		return (
 			<>
+			{this.state.loader && <PageLoader />}
+			{/* <Loader variant="secondary" /> */}
 			<div className="row">
 				<div className="col-md-6">
 					<h2>Users</h2>

@@ -13,7 +13,7 @@ const animatedComponents = makeAnimated();
 
 let inputKey = 0;
 
-class Policy extends React.Component {
+class Policy_ extends React.Component {
 	constructor(props) {
 		super(props);
 		let update = (this.props.match.params?.policy_name !== undefined) ? true : false
@@ -24,32 +24,44 @@ class Policy extends React.Component {
 			update: update,
 			name: '',
 			Version: '',
+			// Effect: '',
+			// Resource: '',
+			// //all_action: false,
+			// selected_action: [],
+			// selected_action_: [{ value: 's3:DeleteBucket', label: 'DeleteBucket' }],
 			readonly: false,
 			fields: [{
 				Effect: 'Allow',
 				//Action: '',
 				selected_action: [],
-				all_action: false,
+				all_action: true,
 				Resource:''
 			}],
 			policy_data:{}
 		};
 
-		this.validator = new SimpleReactValidator({className : "text-danger"});
+		//this.policy = {}
+		//this.policy_data = []
+		
+		this.validator = new SimpleReactValidator({className : "text-danger", autoForceUpdate: this});
 		this.handleChange = this.handleChange.bind(this);
     	this.handleSubmit = this.handleSubmit.bind(this);
+		//this.onValueChange = this.onValueChange.bind(this);
 
 		this.handleInputChange = this.handleInputChange.bind(this);
 
-		this.actions = ['s3:AbortMultipartUpload', 's3:CreateBucket', 's3:DeleteBucket', 's3:ForceDeleteBucket', 's3:DeleteBucketPolicy', 's3:DeleteObject', 's3:GetBucketLocation', 's3:GetBucketNotification', 'GetBucketPolicy', 's3:GetObject', 's3:HeadBucket', 's3:ListAllMyBuckets', 's3:ListBucket', 's3:ListMultipartUploads', 's3:ListenNotification', 's3:ListenBucketNotification', 's3:ListParts','s3:PutBucketLifecycle', 's3:GetBucketLifecycle', 's3:PutObjectNotification', 's3:PutBucketPolicy', 's3:PutObject', 's3:DeleteObjectVersion', 's3:DeleteObjectVersionTagging', 's3:GetObjectVersion', 's3:GetObjectVersionTagging', 's3:PutObjectVersionTagging', 's3:BypassGovernanceRetention', 's3:PutObjectRetention', 's3:GetObjectRetention', 's3:GetObjectLegalHold', 's3:PutObjectLegalHold', 's3:GetBucketObjectLockConfiguration', 's3:PutBucketObjectLockConfiguration', 's3:GetBucketTagging', 's3:PutBucketTagging', 's3:Get', 's3:Put', 's3:Delete', 's3:PutBucketEncryption', 's3:GetBucketEncryption', 's3:PutBucketVersioning', 's3:GetBucketVersioning', 's3:GetReplicationConfiguration','s3:PutReplicationConfiguration', 's3:ReplicateObject', 's3:ReplicateDelete', 's3:ReplicateTags', 's3:GetObjectVersionForReplication'];
+		this.actions = ['s3:AbortMultipartUpload', 's3:CreateBucket', 's3:DeleteBucket', 's3:ForceDeleteBucket', 's3:DeleteBucketPolicy', 's3:DeleteObject', 's3:GetObject', 's3:ListAllMyBuckets', 's3:ListBucket'];
 
 	}
 
 	componentDidMount() {
+		//this.get_user();
+		//const { match: { params } } = this.props;
 		console.log(this.props);
 		if(this.state.update) {
 			this.get_policy()
 		}
+		//console.log(this.state)
 	}
 
 	get_policy = () => {
@@ -127,17 +139,14 @@ class Policy extends React.Component {
 	}
 
 	async handleSubmit(event) {
-		
+		await this.generate();
 		const _alert = this.props.alert;
-
-		if(!this.validate_form()) {
-			event.preventDefault();
-			return false;
+		if (!this.validator.allValid()) {
+			this.validator.showMessages();
+			// rerender to show messages for the first time
+			// you can use the autoForceUpdate option to do this automatically`
+			this.forceUpdate();
 		} else {
-
-			let gen = await this.generate();
-			if(!gen) return false
-
 			let data = {
 				name: this.state.name,
 				policy: this.state.policy_data,
@@ -198,10 +207,8 @@ class Policy extends React.Component {
 			this.forceUpdate();
 			console.log('form error');
 			return false
-		} else {
-			return true
 		}
-		
+		return true
 	}
 
 	generate() {
@@ -214,6 +221,7 @@ class Policy extends React.Component {
 		// }
 
 		if(!this.validate_form()) {
+			console.log('eeerrr')
 			return false;
 		}
 
@@ -385,6 +393,7 @@ class Policy extends React.Component {
 	handleAddFields() {
 
 		if(!this.validate_form()) {
+			console.log('eeerrr')
 			return false;
 		}
 
@@ -516,7 +525,7 @@ class Policy extends React.Component {
 							{/* <button type="button" className="btn btn-sm btn-primary ml-2" onClick="">remove</button> */}
 
 						</div>
-						<div className="form-group">
+						<div className="form-group d-none">
 							<div className="form-group">
 								<button type="button" className="btn btn-sm btn-primary" onClick={this.generate.bind(this)}>Generate</button>
 							</div>
@@ -541,4 +550,4 @@ class Policy extends React.Component {
 }
 
 //export default Policy;
-export default withAlert()(Policy);
+export default withAlert()(Policy_);

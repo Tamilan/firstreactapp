@@ -9,13 +9,14 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { withAlert } from 'react-alert';
 
 import { Link } from "react-router-dom";
-
+import PageLoader from './PageLoader';
 
 class Buckets extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			buckets: []
+			buckets: [],
+			loader: false
 		};
 	}
 
@@ -32,7 +33,8 @@ class Buckets extends React.Component {
 	}
 
 	get_buckets() {
-		console.log(API);
+
+		this.setState({loader: true});
 		API.get(`/s3/buckets`)
 		.then(res => {
 			const alert = this.props.alert;
@@ -50,6 +52,8 @@ class Buckets extends React.Component {
 		console.log(this.state);
 		}).catch( err => {
 			console.log(err);
+		}).then(() => {
+			this.setState({loader: false});
 		});
 	}
 
@@ -102,6 +106,7 @@ class Buckets extends React.Component {
 	render () {
 		return (
 			<>
+			{this.state.loader && <PageLoader />}
 			<div className="row">
 				<div className="col-md-6">
 					<h2>Buckets</h2>
